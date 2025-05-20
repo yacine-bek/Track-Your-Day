@@ -8,6 +8,9 @@ label {
     display: block;
     margin-top: 20px;
 }
+input[type="range"] {
+    width: 100%;
+}
 button {
     margin-top: 40px;
     width: 100%;
