@@ -1,49 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="css.css" />
+        <title>Track Your Day</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css.css">
-    <title>Track Your Day</title>
-    
-</head>
+    <body>
+        <h2>How was your Day?!</h2>
 
-<body>
-    <h2>How was your Day?!</h2>
+        <label>
+            Relation with God:
+            <input type="range" id="god" min="0" max="100" value="50" />
+        </label>
 
-    <label>
-        Relation with God:
-        <input type="range" id="god" min="0" max="100" value="50" />
-    </label>
+        <label>
+            Relation with People:
+            <input type="range" id="nas" min="0" max="100" value="50" />
+        </label>
 
-    <label>
-        Relation with People:
-        <input type="range" id="nas" min="0" max="100" value="50" />
-    </label>
+        <label>
+            Relation with Future:
+            <input type="range" id="future" min="0" max="100" value="50" />
+        </label>
 
-    <label>
-        Relation with Future:
-        <input type="range" id="future" min="0" max="100" value="50" />
-    </label>
+        <label>
+            Relation with Your Self:
+            <input type="range" id="self" min="0" max="100" value="50" />
+        </label>
 
-    <label>
-        Relation with Your Self:
-        <input type="range" id="self" min="0" max="100" value="50" />
-    </label>
+        <label>
+            Your Happiness:
+            <input type="range" id="happy" min="0" max="100" value="50" />
+        </label>
 
-    <label>
-        Your Happiness:
-        <input type="range" id="happy" min="0" max="100" value="50" />
-    </label>
+        <button onclick="submitRanges()">Submit</button>
 
-    <button onclick="submitRanges()">Submit</button>
-    <button onclick="loadWeekData()">Load This Week</button>
+        
+        <select id="typeSelector" onchange="onTypeChange(this.value)">
+            <option value="nas">nas</option>
+            <option value="god">god</option>
+            <option value="future">future</option>
+            <option value="self">self</option>
+            <option value="happy">happy</option>
+        </select>
 
+        <canvas id="myChart" width="600" height="400"></canvas>
 
-
-    <script type="module" src="script.js"></script>
-
-</body>
-
+        <script type="module" src="script.js"></script>
+    </body>
 </html>

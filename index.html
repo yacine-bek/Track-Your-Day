@@ -1,29 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="cssindex.css" />
-    <title>Document</title>
-</head>
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+    <link rel="stylesheet" href="cssindex.css" /> 
+    <title>Document</title> 
+</head> 
 
-<body>
-    <h2>WELCOME!</h2>
-    <label>
-        Enter Your User Name:
-        <input type="text" name="username" id="name" />
-    </label>
-    <button onclick="goToDataPage()">Submit</button>
+<body> 
+    <h2>WELCOME!</h2> 
+    <label> 
+        Enter Your User Name: 
+        <input type="text" name="username" id="name" /> 
+    </label> 
+    <button onclick="goToDataPage()">Submit</button> 
 
-    <script>
-        function goToDataPage() {
-            const username = document.getElementById('name').value.trim();
-            if (username) {
-                window.location.href = `data.html?username=${encodeURIComponent(username)}`;
-            } else {
-                alert('Please enter a username.');
+    <script> 
+        // Check on page load
+        window.onload = function () {
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) {
+                window.location.href = `data.html?username=${encodeURIComponent(savedUsername)}`;
             }
-        }
-    </script>
-</body>
+        };
+
+        function goToDataPage() { 
+            const username = document.getElementById('name').value.trim(); 
+            if (username) { 
+                localStorage.setItem('username', username); // Save for next time
+                window.location.href = `data.html?username=${encodeURIComponent(username)}`; 
+            } else { 
+                alert('Please enter a username.'); 
+            } 
+        } 
+    </script> 
+</body> 
 </html>

@@ -1,28 +1,36 @@
-// Load Firebase SDKs
+// Load Firebase SDKs 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
 import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
 
-// CONFIG – Don't hardcode in production
-import { firebaseConfig } from './firebase-config.js'; // 🔐 External secure file
+// CONFIG – Don't hardcode in production 
+import { firebaseConfig } from './firebase-config.js'; // 🔐 External secure file 
 
-// Initialize Firebase
+// Initialize Firebase 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-// Track current user UID after sign-in
+
+let cachedWeekData = [];
+
+
 let currentUID = null;
 
-// Sign in anonymously
+
+function get_username() {
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get("username");
+    return username;
+}
+
+// Sign in anonymously 
 signInAnonymously(auth)
     .then(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                currentUID = user.uid;
-                console.log("Signed in. UID:", currentUID);
-            } else {
-                console.error("User not authenticated.");
+                currentUID = get_username();
+                window.loadWeekData();
             }
         });
     })
@@ -30,7 +38,8 @@ signInAnonymously(auth)
         alert("Auth failed: " + error.message);
     });
 
-// Submit ranges
+
+// Submit ranges 
 window.submitRanges = function () {
     if (!currentUID) return alert("Not authenticated.");
 
@@ -46,16 +55,23 @@ window.submitRanges = function () {
     const dailyRef = ref(db, "daily/" + currentUID + "/" + today);
 
     set(dailyRef, data)
-        .then(() => alert("Your data was saved successfully!"))
-        .catch((error) => alert("Error saving data: " + error.message));
+    .then(() => {
+        alert("Your data was saved successfully!");
+        window.loadWeekData();
+    })
+    .catch((error) => alert("Error saving data: " + error.message));
+
 };
 
-// Load the last 7 days
+
+
+// Load the last 7 days 
 window.loadWeekData = async function () {
     if (!currentUID) return alert("Not authenticated.");
     const today = new Date();
     const results = [];
     const dbRef = ref(db);
+    const type = document.getElementById("typeSelector").value
 
     for (let i = 0; i < 7; i++) {
         const date = new Date(today);
@@ -68,7 +84,72 @@ window.loadWeekData = async function () {
             console.error("Error reading data:", error);
         }
     }
+    cachedWeekData = results; // Save data for later redraws
+    drawGraph(cachedWeekData, type);
 
-    console.log(results);
-    alert(JSON.stringify(results, null, 2));
 };
+
+window.onTypeChange = function (newType) {
+    if (!cachedWeekData.length) return;
+    drawGraph(cachedWeekData, newType);
+};
+
+
+
+
+function drawGraph(dataArray, type) {
+    const filtered = dataArray
+        .filter(entry => entry.data !== null) // skip missing days
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+    const labels = filtered.map(entry => entry.date);
+    const values = filtered.map(entry => entry.data[type]);
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    const chartData = {
+        labels: labels,
+        datasets: [{
+            label: `${type} percentage`,
+            data: values,
+            fill: false,
+            borderColor: 'blue',
+            tension: 0.3,
+            pointRadius: 5,
+            pointHoverRadius: 7
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        callback: value => value + '%'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Percentage'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    };
+
+    if (window.myChart instanceof Chart) {
+        window.myChart.destroy();
+    }
+
+    window.myChart = new Chart(ctx, config);
+}
