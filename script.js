@@ -4,7 +4,12 @@ import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/fireb
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
 
 // CONFIG – Don't hardcode in production 
-import { firebaseConfig } from './firebase-config.js'; // 🔐 External secure file 
+import { firebaseConfig as rawConfig } from './firebase-config.js';
+
+const firebaseConfig = {
+  ...rawConfig,
+  apiKey: atob(rawConfig.apiKey),
+};
 
 // Initialize Firebase 
 const app = initializeApp(firebaseConfig);
@@ -153,3 +158,5 @@ function drawGraph(dataArray, type) {
 
     window.myChart = new Chart(ctx, config);
 }
+
+
